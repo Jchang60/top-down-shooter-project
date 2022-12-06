@@ -8,14 +8,22 @@ camera = pygame.math.Vector2((0, 0))
 walk_channel = pygame.mixer.Channel(2)
 
 class SoundManagerWalk:
-    sounds = [pygame.mixer.Sound('run_concrete1.wav'), pygame.mixer.Sound('run_concrete2.wav'), pygame.mixer.Sound('run_concrete3.wav'), pygame.mixer.Sound('run_concrete4.wav'), pygame.mixer.Sound('run_concrete5.wav'), pygame.mixer.Sound('run_concrete6.wav')]
+    sounds = [pygame.mixer.Sound('run_concrete1.wav'), 
+              pygame.mixer.Sound('run_concrete2.wav'), 
+              pygame.mixer.Sound('run_concrete3.wav'), 
+              pygame.mixer.Sound('run_concrete4.wav'), 
+              pygame.mixer.Sound('run_concrete5.wav'), 
+              pygame.mixer.Sound('run_concrete6.wav')]
 
     @staticmethod
     def playRandom():
         random.choice(SoundManagerWalk.sounds).play()
 
 class SoundManagerYell:
-    sounds = [pygame.mixer.Sound('[CALL]YellAtSuspect_0.wav'), pygame.mixer.Sound('[CALL]YellAtSuspect_1.wav'), pygame.mixer.Sound('[CALL]YellAtSuspect_2.wav'), pygame.mixer.Sound('[CALL]YellAtCivilian_9.wav')] # list of sound objects
+    sounds = [pygame.mixer.Sound('[CALL]YellAtSuspect_0.wav'), 
+              pygame.mixer.Sound('[CALL]YellAtSuspect_1.wav'), 
+              pygame.mixer.Sound('[CALL]YellAtSuspect_2.wav'), 
+              pygame.mixer.Sound('[CALL]YellAtCivilian_9.wav')] # list of sound objects
 
     @staticmethod
     def playRandom():
@@ -91,8 +99,16 @@ def fire():
     elif random_multiple1 > 66:
         pygame.mixer.Sound.play(shellcasing_sound3)
 
-
-
+class Enemy():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.hp = 100
+        pygame.sprite.Sprite.__init__(self)
+        self.original_image = pygame.transform.scale(pygame.image.load('arrow_up.png'), (100, 120))
+        self.image = self.original_image
+        self.rect = self.image.get_rect(center = (x, y))
+        
 pygame.init()
 display_width = 1600
 display_height = 900
@@ -181,6 +197,6 @@ while run:
     pygame.display.flip()
     clock.tick(60)
     pygame.display.update()
-d
+
 pygame.quit()
 exit()
