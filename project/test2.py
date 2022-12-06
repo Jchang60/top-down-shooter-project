@@ -100,14 +100,50 @@ def fire():
         pygame.mixer.Sound.play(shellcasing_sound3)
 
 class Enemy():
-    def __init__(self, x, y):
+    def __init__(self, x, y, mode, dist, walk=3):
+        #mode 0 = vertical
+        #mode 1 = horizontal
         self.x = x
         self.y = y
+        self.walk = walk
+        self.mode = mode
+        self.dist = dist
         self.hp = 100
-        pygame.sprite.Sprite.__init__(self)
-        self.original_image = pygame.transform.scale(pygame.image.load('arrow_up.png'), (100, 120))
-        self.image = self.original_image
-        self.rect = self.image.get_rect(center = (x, y))
+        self.counter = 0
+    
+    def main(self, display):
+        if self.mode == 0:
+            self.y += self.walk
+            self.counter += 1
+            if self.counter >= self.dist:
+                self.counter = 0
+                self.walk *= -1
+        if self.mode == 1:
+            self.x += self.walk
+            self.counter += self.walk
+            if self.counter >= self.dist:
+                self.counter = 0
+                self.walk *= -1
+                
+        pygame.draw.rect(display, (255, 0, 0), (self.x, self.y, 16, 16), 1)
+'''  
+    def advanced_movement(self, display, hlist, vlist):
+        if self.mode == 0:
+            self.y += self.walk
+            self.counter += 1
+            if self.counter >= self.dist:
+                self.counter = 0
+                self.walk *= -1
+        if self.mode == 1:
+            self.x += self.walk
+            self.counter += self.walk
+            if self.counter >= self.dist:
+                self.counter = 0
+                self.walk *= -1
+                
+        pygame.draw.rect(display, (255, 0, 0), (self.x, self.y, 16, 16), 1)
+        
+'''
         
 pygame.init()
 display_width = 1600
@@ -118,6 +154,9 @@ clock = pygame.time.Clock()
 #display_scroll = [0, 0]
 player_bullets = [] 
 player = Player(*display.get_rect().center)
+
+enemy1 = Enemy(100, 100, 0, 200)
+
 all_sprites = pygame.sprite.Group(player)
 
 #background
@@ -157,14 +196,6 @@ while run:
             if event.button == 1:
                 fire()
                 player_bullets.append(PlayerBullet(player.rect.center[0], player.rect.center[1], mouse_x, mouse_y))
-                # if mouse_y < 400:
-                #     player_bullets.append(PlayerBullet(player.rect.centerx + 71, player.rect.centery, mouse_x, mouse_y))
-                # elif mouse_x > 720:
-                #     player_bullets.append(PlayerBullet(player.rect.centerx, player.rect.centery + 78, mouse_x, mouse_y))
-                # elif mouse_x < 720:
-                #     player_bullets.append(PlayerBullet(player.rect.centerx, player.rect.centery - 78, mouse_x, mouse_y))    
-                # elif mouse_y > 400:
-                #     player_bullets.append(PlayerBullet(player.rect.centerx - 71, player.rect.centery, mouse_x, mouse_y))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e:
                 yell()
@@ -194,6 +225,7 @@ while run:
     for bullet in player_bullets:
         bullet.main(display)
     all_sprites.draw(display)
+    enemy1.main(display)
     pygame.display.flip()
     clock.tick(60)
     pygame.display.update()
