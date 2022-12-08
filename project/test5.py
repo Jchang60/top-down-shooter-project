@@ -61,6 +61,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.hp = 100
         pygame.sprite.Sprite.__init__(self)
         self.original_image = pygame.transform.scale(pygame.image.load('arrow_up.png'), (100, 120))
         self.image = self.original_image
@@ -136,6 +137,29 @@ class Enemy():
         
         if not self.hp <= 0:        
             pygame.draw.rect(display, (255, 0, 0), (self.x - 12.5, self.y - 12.5, 25, 25), True)
+            
+            if self.counter % 25 == 0 and not player.hp <= 0:
+                rando = random.randint(0, 3)
+                if rando == 0:
+                    enemy_bullets.append(EnemyBullet(enemy.x, enemy.y, player.rect.center[0], player.rect.center[1]))
+        
+
+class EnemyBullet():
+    def __init__(self, x, y, player_x, player_y):
+        self.x = x
+        self.y = y
+        self.player_x = player_x
+        self.player_y = player_y
+        self.speed = 7.5
+        self.angle = math.atan2(y - player_y, x - player_x)
+        self.x_vel = math.cos(self.angle) * self.speed
+        self.y_vel = math.sin(self.angle) * self.speed
+    
+    def main(self, display):
+        self.x -= float(self.x_vel)
+        self.y -= float(self.y_vel)
+
+        pygame.draw.circle(display, (0, 0, 0), (self.x, self.y), 3)
 
 def walk():
     if not walk_channel.get_busy():
@@ -182,6 +206,7 @@ clock = pygame.time.Clock()
 
 player_bullets = [] 
 player = Player(*display.get_rect().center)
+enemy_bullets = []
 all_sprites = pygame.sprite.Group(player)
 
 enemy1 = Enemy(100, 100, 0, 200)
@@ -213,6 +238,7 @@ reload6 = pygame.mixer.Sound('weap_magin_plastic.wav')
 reload7 = pygame.mixer.Sound('weap_round_in_chamber_mag.wav')
 
 # Main Game Setup
+color = (71, 71, 71)
 run = True
 while run:
     # in the main loop: adjust the camera position to center the player
@@ -229,10 +255,8 @@ while run:
             if event.button == 1:
                 fire()
                 player_bullets.append(PlayerBullet(player.rect.center[0], player.rect.center[1], mouse_x, mouse_y))
-                for enemy in enemies_list:
-                    if abs(mouse_x - enemy.x) <= 20 and abs(mouse_y - enemy.y) <= 20:
-                        enemy.hp -= 25
-                        break
+
+
                             
         # Turning Sound Effect
         if event.type == pygame.MOUSEMOTION:
@@ -263,12 +287,31 @@ while run:
         walk()
     
     # display.fill((255, 255, 255))
-    display.fill((71, 71, 71))
+    display.fill(color)
     for bullet in player_bullets:
         bullet.main(display)
-    all_sprites.draw(display)
+    for bullet in enemy_bullets:
+        bullet.main(display)
+    if not player.hp <= 0:
+        all_sprites.draw(display)
     for enemy in enemies_list:
         enemy.main(display)
+    
+    for bullet in player_bullets:
+        for enemy in enemies_list:
+            if abs(bullet.x - enemy.x) <= 50 and abs(bullet.y - enemy.y) <= 50:
+                enemy.hp -= 25
+                break
+    
+    for bullet in enemy_bullets:
+        if abs(bullet.x - (player.rect.center[0] + 100)) <= 200 and abs(bullet.y - (player.rect.center[1] + 50)) <= 200:
+            color = (255, 0, 0)
+            enemy_bullets.remove(bullet)
+            player.hp -= 10
+            
+        else:
+            if not player.hp <= 0:
+                color = (71, 71, 71)
     pygame.display.flip()
     clock.tick(60)
     pygame.display.update()
