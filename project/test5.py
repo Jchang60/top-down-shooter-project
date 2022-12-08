@@ -133,8 +133,9 @@ class Enemy():
             if self.counter >= self.dist:
                 self.counter = 0
                 self.walk *= -1
-                
-        pygame.draw.rect(display, (255, 0, 0), (self.x, self.y, 16, 16), True)
+        
+        if not self.hp <= 0:        
+            pygame.draw.rect(display, (255, 0, 0), (self.x - 12.5, self.y - 12.5, 25, 25), True)
 
 def walk():
     if not walk_channel.get_busy():
@@ -187,6 +188,7 @@ enemy1 = Enemy(100, 100, 0, 200)
 enemy2 = Enemy(550, 250, 1, 150)
 enemy3 = Enemy(350, 550, 1, 100)
 enemy4 = Enemy(200, 200, 0, 50)
+enemies_list = [enemy1, enemy2, enemy3, enemy4]
 
 #background
 floor_image = pygame.image.load('grid1.png')
@@ -227,7 +229,11 @@ while run:
             if event.button == 1:
                 fire()
                 player_bullets.append(PlayerBullet(player.rect.center[0], player.rect.center[1], mouse_x, mouse_y))
-        
+                for enemy in enemies_list:
+                    if abs(mouse_x - enemy.x) <= 20 and abs(mouse_y - enemy.y) <= 20:
+                        enemy.hp -= 25
+                        break
+                            
         # Turning Sound Effect
         if event.type == pygame.MOUSEMOTION:
             turn()
@@ -261,10 +267,8 @@ while run:
     for bullet in player_bullets:
         bullet.main(display)
     all_sprites.draw(display)
-    enemy1.main(display)
-    enemy2.main(display)
-    enemy3.main(display)
-    enemy4.main(display)
+    for enemy in enemies_list:
+        enemy.main(display)
     pygame.display.flip()
     clock.tick(60)
     pygame.display.update()
