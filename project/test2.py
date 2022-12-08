@@ -6,35 +6,57 @@ import map
 # at the beginning: set camera
 camera = pygame.math.Vector2((0, 0))
 walk_channel = pygame.mixer.Channel(2)
+turn_channel = pygame.mixer.Channel(3)
 
+# SFX
 class SoundManagerWalk:
-    sounds = [pygame.mixer.Sound('run_concrete1.wav'), 
-              pygame.mixer.Sound('run_concrete2.wav'), 
-              pygame.mixer.Sound('run_concrete3.wav'), 
-              pygame.mixer.Sound('run_concrete4.wav'), 
-              pygame.mixer.Sound('run_concrete5.wav'), 
-              pygame.mixer.Sound('run_concrete6.wav')]
+    sounds = [pygame.mixer.Sound('run_concrete1.wav'), pygame.mixer.Sound('run_concrete2.wav'), pygame.mixer.Sound('run_concrete3.wav'), pygame.mixer.Sound('run_concrete4.wav'), pygame.mixer.Sound('run_concrete5.wav'), pygame.mixer.Sound('run_concrete6.wav')]
 
     @staticmethod
     def playRandom():
         random.choice(SoundManagerWalk.sounds).play()
 
 class SoundManagerYell:
-    sounds = [pygame.mixer.Sound('[CALL]YellAtSuspect_0.wav'), 
-              pygame.mixer.Sound('[CALL]YellAtSuspect_1.wav'), 
-              pygame.mixer.Sound('[CALL]YellAtSuspect_2.wav'), 
-              pygame.mixer.Sound('[CALL]YellAtCivilian_9.wav')] # list of sound objects
+    sounds = [pygame.mixer.Sound('[CALL]YellAtSuspect_0.wav'), pygame.mixer.Sound('[CALL]YellAtSuspect_1.wav'), pygame.mixer.Sound('[CALL]YellAtSuspect_2.wav')] # list of sound objects
 
     @staticmethod
     def playRandom():
         random.choice(SoundManagerYell.sounds).play()
+        random.choice(SoundManagerYell.sounds).set_volume(0.72)
     
+class SoundManagerReloadYell:
+    sounds = [pygame.mixer.Sound('usec3_weap_reload_01.wav'), pygame.mixer.Sound('usec3_weap_reload_02.wav'), pygame.mixer.Sound('usec3_weap_reload_09_bl.wav')] # list of sound objects
+
+    @staticmethod
+    def playRandom():
+        random.choice(SoundManagerReloadYell.sounds).play()
+    
+def reloadyell():
+    SoundManagerReloadYell.playRandom()
+
 def yell():
     SoundManagerYell.playRandom()
 
-# def floor(floor_x, floor_y):
-#     display.blit(floor_image, (floor_x, floor_y))
 
+def turn():
+    if not turn_channel.get_busy():
+        random_multiple = random.randrange(0, 100)
+        if random_multiple <= 33:
+            pygame.mixer.Sound.play(turn_sound1)
+            turn_sound1.set_volume(0.25)
+            pygame.mixer.Sound.stop
+        
+        elif 33 > random_multiple <= 66:
+            pygame.mixer.Sound.play(turn_sound2)
+            turn_sound2.set_volume(0.25)
+            pygame.mixer.Sound.stop
+        
+        else:
+            pygame.mixer.Sound.play(turn_sound3)
+            turn_sound3.set_volume(0.25)
+            pygame.mixer.Sound.stop
+    
+# Player Class
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         self.x = x
@@ -55,16 +77,6 @@ class Player(pygame.sprite.Sprite):
     def move(self, x, y):
         self.rect.move_ip(x * self.velocity, y * self.velocity)
 
-# class Handgun():
-#      def __init__(self, x, y):
-#         self.x = player.image.get_rect()[0]
-#         self.y = player.image.get_rect()[1]
-#         self.mag_capacity = 17
-
-#      def main(self, display):
-#         self.x = player.rect[0]
-#         self.y = player.rect[1]
-
 class PlayerBullet():
     def __init__(self, x, y, mouse_x, mouse_y):
         self.x = x
@@ -83,13 +95,13 @@ class PlayerBullet():
         pygame.draw.circle(display, (0, 0, 0), (self.x, self.y), 1)
 
 
-
 def walk():
     if not walk_channel.get_busy():
         SoundManagerWalk.playRandom()
 
 def fire():
     pygame.mixer.Sound.play(gunshot_sound)
+    gunshot_sound.set_volume(6.9)
     pygame.time.Clock().tick(1000)
     random_multiple1 = random.randrange(0, 99)
     if random_multiple1 <= 33:
@@ -99,64 +111,38 @@ def fire():
     elif random_multiple1 > 66:
         pygame.mixer.Sound.play(shellcasing_sound3)
 
-class Enemy():
-    def __init__(self, x, y, mode, dist, walk=3):
-        #mode 0 = vertical
-        #mode 1 = horizontal
-        self.x = x
-        self.y = y
-        self.walk = walk
-        self.mode = mode
-        self.dist = dist
-        self.hp = 100
-        self.counter = 0
-    
-    def main(self, display):
-        if self.mode == 0:
-            self.y += self.walk
-            self.counter += 1
-            if self.counter >= self.dist:
-                self.counter = 0
-                self.walk *= -1
-        if self.mode == 1:
-            self.x += self.walk
-            self.counter += self.walk
-            if self.counter >= self.dist:
-                self.counter = 0
-                self.walk *= -1
-                
-        pygame.draw.rect(display, (255, 0, 0), (self.x, self.y, 16, 16), 1)
-'''  
-    def advanced_movement(self, display, hlist, vlist):
-        if self.mode == 0:
-            self.y += self.walk
-            self.counter += 1
-            if self.counter >= self.dist:
-                self.counter = 0
-                self.walk *= -1
-        if self.mode == 1:
-            self.x += self.walk
-            self.counter += self.walk
-            if self.counter >= self.dist:
-                self.counter = 0
-                self.walk *= -1
-                
-        pygame.draw.rect(display, (255, 0, 0), (self.x, self.y, 16, 16), 1)
-        
-'''
-        
+def reload():
+    pygame.mixer.Sound.play(reload1)
+    pygame.mixer.Sound.play(reload2)
+    pygame.mixer.Sound.play(reload3)
+    pygame.time.delay(850)
+    pygame.mixer.Sound.fadeout(reload3, 900)
+    pygame.mixer.Sound.play(reload4)
+    pygame.time.Clock().tick(1200)
+    pygame.mixer.Sound.play(reload5)
+    pygame.time.Clock().tick(900)
+    pygame.mixer.Sound.play(reload6)
+    pygame.time.delay(400)
+    pygame.mixer.Sound.fadeout(reload6, 400)
+    pygame.mixer.Sound.play(reload7)
+
 pygame.init()
-display_width = 1600
-display_height = 900
+# Display Settings
+display_width = 1300
+display_height = 750
 
 display = pygame.display.set_mode((display_width, display_height))
 clock = pygame.time.Clock()
-#display_scroll = [0, 0]
+
+# camera_group = pygame.sprite.Group()
+
+# Background Music
+pygame.mixer.music.load('BG_music.wav')
+pygame.mixer.music.play()
+pygame.mixer.music.set_volume(0.59)
+
 player_bullets = [] 
 player = Player(*display.get_rect().center)
-
-enemy1 = Enemy(100, 100, 0, 200)
-
 all_sprites = pygame.sprite.Group(player)
 
 #background
@@ -181,7 +167,7 @@ reload5 = pygame.mixer.Sound('weap_magin_rig.wav')
 reload6 = pygame.mixer.Sound('weap_magin_plastic.wav')
 reload7 = pygame.mixer.Sound('weap_round_in_chamber_mag.wav')
 
-
+# Main Game Setup
 run = True
 while run:
     # in the main loop: adjust the camera position to center the player
@@ -192,25 +178,32 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+
+        # Shooting Mechanic    
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 fire()
                 player_bullets.append(PlayerBullet(player.rect.center[0], player.rect.center[1], mouse_x, mouse_y))
+        
+        # Turning Sound Effect
+        if event.type == pygame.MOUSEMOTION:
+            turn()
+
+        # Yell for Compliance
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e:
                 yell()
+
+        # Reload Yell
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                reloadyell()
+                reload()
 
     player.point_at(*pygame.mouse.get_pos())
     keys = pygame.key.get_pressed()
     player.move(keys[pygame.K_d]-keys[pygame.K_a], keys[pygame.K_s]-keys[pygame.K_w])
     
-    #scroll mechanic?
-    #floor(0 - display_scroll[0], 0 - display_scroll[1])
-    
-    #test enemy
-    pygame.draw.rect(display, (255, 0, 0), (100 - camera[0], 100 - camera[1], 16, 16))
-
-
     if keys[pygame.K_a]:
         walk()
     if keys[pygame.K_d]:
@@ -221,11 +214,10 @@ while run:
         walk()
     
     # display.fill((255, 255, 255))
-    display.fill((69, 69, 69))
+    display.fill((71, 71, 71))
     for bullet in player_bullets:
         bullet.main(display)
     all_sprites.draw(display)
-    enemy1.main(display)
     pygame.display.flip()
     clock.tick(60)
     pygame.display.update()
