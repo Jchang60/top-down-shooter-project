@@ -76,6 +76,20 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, x, y):
         self.rect.move_ip(x * self.velocity, y * self.velocity)
+    
+    def move(camera, x, y):
+        
+        if camera.rect.x < 0:
+            camera.rect.x = 0
+        if camera.rect.y < 0:
+            camera.rect.y = 0
+        if camera.rect.x > 1175:
+            camera.rect.x = 1175
+        if camera.rect.y > 620:
+            camera.rect.y = 620
+
+        camera.rect.move_ip(x * camera.velocity, y * camera.velocity)
+
 
 class PlayerBullet():
     def __init__(self, x, y, mouse_x, mouse_y):
