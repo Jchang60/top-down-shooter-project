@@ -4,6 +4,7 @@ from settings import *
 from map import * 
 from player import *
 from raycasting import *
+from enemy import *
 
 
 class Game:
