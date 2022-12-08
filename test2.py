@@ -94,6 +94,7 @@ class PlayerBullet():
 
         pygame.draw.circle(display, (0, 0, 0), (self.x, self.y), 1)
 
+
 def walk():
     if not walk_channel.get_busy():
         SoundManagerWalk.playRandom()
@@ -132,6 +133,8 @@ display_height = 750
 
 display = pygame.display.set_mode((display_width, display_height))
 clock = pygame.time.Clock()
+
+# camera_group = pygame.sprite.Group()
 
 # Background Music
 pygame.mixer.music.load('BG_music.wav')
@@ -201,9 +204,6 @@ while run:
     keys = pygame.key.get_pressed()
     player.move(keys[pygame.K_d]-keys[pygame.K_a], keys[pygame.K_s]-keys[pygame.K_w])
     
-    #test enemy(not working)
-    pygame.draw.rect(display, (255, 0, 0), (100 - camera[0], 100 - camera[1], 16, 16))
-
     if keys[pygame.K_a]:
         walk()
     if keys[pygame.K_d]:
