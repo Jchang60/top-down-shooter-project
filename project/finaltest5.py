@@ -2,7 +2,7 @@ import pygame, math, sys, random
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
 import map
-
+   
 # at the beginning: set camera
 camera = pygame.math.Vector2((0, 0))
 walk_channel = pygame.mixer.Channel(2)
@@ -170,6 +170,9 @@ class EnemyBullet():
 def walk():
     if not walk_channel.get_busy():
         SoundManagerWalk.playRandom()
+    else:
+        if player.hp <= 0:
+            None
 
 def fire():
     pygame.mixer.Sound.play(gunshot_sound)
@@ -312,7 +315,8 @@ while run:
         all_sprites.draw(display)
     for enemy in enemies_list:
         enemy.main(display)
-    
+    img = pygame.image.load('bckgnd.png').convert_alpha()
+    display.blit(img, (0,0)) 
     for bullet in player_bullets:
         for enemy in enemies_list:
             if abs(bullet.x - enemy.x) <= 50 and abs(bullet.y - enemy.y) <= 50:
@@ -322,15 +326,23 @@ while run:
     for bullet in enemy_bullets:
         if abs(bullet.x - (player.rect.center[0] + 100)) <= 200 and abs(bullet.y - (player.rect.center[1] + 50)) <= 200:
             color = (81, 4, 0)
+
+
             enemy_bullets.remove(bullet)
             player.hp -= 10
             
-        else:
-            if not player.hp <= 0:
+        elif not player.hp <= 0:
                 color = (71, 71, 71)
+ 
+        else: 
+            if player.hp <=0:
+                img = pygame.image.load('ded.png').convert_alpha()
+                display.blit(img, (0,0))                    
+
     pygame.display.flip()
     clock.tick(60)
     pygame.display.update()
 
+    
 pygame.quit()
 exit()
