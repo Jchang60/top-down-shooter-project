@@ -1,7 +1,6 @@
 import pygame, math, sys, random
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
-import map
 
 # at the beginning: set camera
 camera = pygame.math.Vector2((0, 0))
@@ -130,7 +129,6 @@ pygame.init()
 # Display Settings
 display_width = 1300
 display_height = 750
-
 display = pygame.display.set_mode((display_width, display_height))
 clock = pygame.time.Clock()
 
@@ -215,6 +213,7 @@ while run:
     
     # display.fill((255, 255, 255))
     display.fill((71, 71, 71))
+
     for bullet in player_bullets:
         bullet.main(display)
     all_sprites.draw(display)
